@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+cdsapi
+python-dotenv
+xarray
+netCDF4
+cfgrib

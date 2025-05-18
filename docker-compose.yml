@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  frontend:
+    build: ./cds-ui
+    command: sh -c "npm run build && npm start"
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000/api/climate
+    depends_on:
+      - backend
+    volumes:
+      - ./cds-ui:/app
+      - /app/node_modules
+
+  backend:
+    build: ./cds-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./cds-api:/app
+      - ./cds-api/output:/app/output
+    environment:
+      - PORT=8000
