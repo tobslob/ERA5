@@ -37,7 +37,7 @@ async def get_chart_data(file_path: str, lat: float, lon: float, variable: str =
 
 
 @router.get("/map")
-async def get_grid_data(file_path: str, time: str, variable: str = "t2m"):
+async def get_map_data(file_path: str, time: str, variable: str = "t2m"):
     try:
         result = await extract_map_data(file_path, time, variable)
         return result
