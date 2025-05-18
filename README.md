@@ -1,62 +1,75 @@
-# Climate Data System
+# Climate Data System (ERA5)
 
-## Quick Start with Docker Compose
+## Project Structure
 
-1. **Prerequisites**:
-   - Docker
-   - Docker Compose
+```bash
+project-root/
+├── cds-api/       # FastAPI backend
+├── cds-ui/        # Next.js frontend (submodule)
+└── docker-compose.yml
+```
 
-2. **Run the full stack**:
+## Setup Instructions
+
+1. **Clone the main project**:
 
    ```bash
-   docker-compose up --build
+   git clone --recurse-submodules https://github.com/tobslob/ERA5.git
+   cd ERA5
    ```
 
-   - Frontend: <http://localhost:3000>
-   - Backend API: <http://localhost:8000/docs>
+2. **Verify submodules**:
 
-## Individual Service Control
+   ```bash
+   git submodule status
+   # Should show: cds-ui (hash) cds-ui
+   ```
 
-### Frontend (Next.js)
+## Running with Docker
+
+### Full Stack
 
 ```bash
-# Build and run
+docker-compose up --build
+```
+
+- Frontend: <http://localhost:3000>
+- Backend API: <http://localhost:8000/docs>
+
+### Individual Services
+
+```bash
+# Frontend only (Next.js)
 docker-compose up frontend
 
-# Stop
-docker-compose stop frontend
-
-# View logs
-docker-compose logs -f frontend
-```
-
-### Backend (FastAPI)
-
-```bash
-# Build and run
+# Backend only (FastAPI)
 docker-compose up backend
-
-# Stop
-docker-compose stop backend
-
-# View logs
-docker-compose logs -f backend
 ```
 
-## Development Tips
+## Development Workflow
 
-1. **Rebuild specific service**:
+1. **Update submodules**:
+
+   ```bash
+   git submodule update --remote
+   ```
+
+2. **Rebuild specific service**:
 
    ```bash
    docker-compose up --build frontend
    ```
 
-2. **Clean up**:
+3. **Clean up**:
 
    ```bash
    docker-compose down -v
    ```
 
-3. **Environment Variables**:
-   - Edit `.env` files in each service directory
-   - Frontend connects to backend via `NEXT_PUBLIC_API_URL`
+## Repository Links
+
+- [Main Project](https://github.com/tobslob/ERA5)
+- [Frontend Submodule](https://github.com/tobslob/cds-ui)
+- [Backend API](https://github.com/tobslob/ERA5/tree/main/cds-api)
+
+> Note: The frontend is maintained as a separate repository but included as a submodule for development convenience.
