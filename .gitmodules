@@ -1,0 +1,3 @@
+[submodule "cds-ui"]
+	path = cds-ui
+	url = https://github.com/tobslob/cds-ui.git
