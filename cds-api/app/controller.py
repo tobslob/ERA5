@@ -55,27 +55,29 @@ async def extract_map_data(file_path, time: str, variable: str):
     loop = asyncio.get_running_loop()
     with ThreadPoolExecutor() as pool:
         ds, mapped_var = await loop.run_in_executor(pool, load_variable, file_path, variable)
+
     data = ds[mapped_var]
 
-    if "valid_time" in data.coords:
-        time_coord = "valid_time"
-    elif "time" in data.coords:
-        time_coord = "time"
-    else:
-        time_coord = None
+    import numpy as np
+    parsed_time = np.datetime64(time)
 
-    if time_coord and time_coord in data.dims:
-        import numpy as np
-        parsed_time = np.datetime64(time)
-        data = data.sel({time_coord: parsed_time}, method="nearest")
+    # Use "time", not "valid_time"
+    if "time" in data.dims:
+        data = data.sel(time=parsed_time, method="nearest")
+    else:
+        raise ValueError("No 'time' dimension found in dataset")
 
     values = data.values
     lat = data.latitude.values
     lon = data.longitude.values
 
-    return [
-        {"lat": float(lat[i]), "lon": float(lon[j]),
-         "value": round(float(values[i][j]), 2)}
-        for i in range(len(lat))
-        for j in range(len(lon))
-    ]
+    result = []
+    for i in range(len(lat)):
+        for j in range(len(lon)):
+            result.append({
+                "lat": float(lat[i]),
+                "lon": float(lon[j]),
+                "value": round(float(values[i][j]), 2)
+            })
+
+    return result
