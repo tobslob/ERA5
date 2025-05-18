@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.controller import extract_chart_data, extract_grid_data, fetch_climate_data
+from app.controller import extract_chart_data, extract_map_data, fetch_climate_data
 from pydantic import BaseModel
 from typing import List, Union
 
@@ -21,7 +21,7 @@ class ClimateRequest(BaseModel):
 @router.post("/")
 def get_climate_data(request: ClimateRequest):
     try:
-        file_path = fetch_climate_data(request.dict())
+        file_path = fetch_climate_data(request.model_dump())
         return {"success": True, "file_path": file_path}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -36,10 +36,10 @@ async def get_chart_data(file_path: str, lat: float, lon: float, variable: str =
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/grid")
+@router.get("/map")
 async def get_grid_data(file_path: str, time: str, variable: str = "t2m"):
     try:
-        result = await extract_grid_data(file_path, time, variable)
+        result = await extract_map_data(file_path, time, variable)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

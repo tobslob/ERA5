@@ -8,7 +8,7 @@ def ensure_list(value):
     return value if isinstance(value, list) else [value]
 
 
-async def fetch_climate_data(params):
+def fetch_climate_data(params):
     product_type = ensure_list(params["product_type"])
     data_format = params["data_format"]
     variable = ensure_list(params["variable"])
@@ -28,12 +28,16 @@ async def extract_chart_data(file_path: str, lat: float, lon: float, variable: s
         ds, mapped_var = await loop.run_in_executor(pool, load_variable, file_path, variable)
     data = ds[mapped_var]
 
-    data = ds[variable].sel(latitude=lat, longitude=lon, method='nearest')
+    time_coord = None
+    for coord in ["time", "valid_time"]:
+        if coord in data.coords:
+            time_coord = coord
+            break
 
-    time_coord = 'valid_time' if 'valid_time' in data.coords else 'time'
+    if not time_coord:
+        raise Exception("No time coordinate found in dataset.")
 
-    if time_coord not in data.dims:
-        data = data.expand_dims(time_coord)
+    data = data.sel(latitude=lat, longitude=lon, method="nearest")
 
     results = []
     for i in range(data.sizes[time_coord]):
@@ -47,7 +51,7 @@ async def extract_chart_data(file_path: str, lat: float, lon: float, variable: s
     return results
 
 
-async def extract_grid_data(file_path, time: str, variable: str):
+async def extract_map_data(file_path, time: str, variable: str):
     loop = asyncio.get_running_loop()
     with ThreadPoolExecutor() as pool:
         ds, mapped_var = await loop.run_in_executor(pool, load_variable, file_path, variable)
