@@ -53,7 +53,6 @@ async def extract_grid_data(file_path, time: str, variable: str):
         ds, mapped_var = await loop.run_in_executor(pool, load_variable, file_path, variable)
     data = ds[mapped_var]
 
-    # Use 'valid_time' if it's in data.coords, fallback to 'time'
     if "valid_time" in data.coords:
         time_coord = "valid_time"
     elif "time" in data.coords:
@@ -61,7 +60,6 @@ async def extract_grid_data(file_path, time: str, variable: str):
     else:
         time_coord = None
 
-    # Only select if the data is time-indexed
     if time_coord and time_coord in data.dims:
         import numpy as np
         parsed_time = np.datetime64(time)
